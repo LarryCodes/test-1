@@ -55,8 +55,14 @@ Route::add('/users/country', function() use ($db, $redis) {
 	if (!validateRequestMethod('GET')) return;
 	$email = $_GET['email'] ?? null;
 
-	// Validate email query parameter
-	if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+	// use validator to validate email
+	$validator = new Validator;
+	$validation = $validator->make(['email' => $email], [
+		'email' => 'required|email',
+	]);
+	$validation->validate();
+
+	if ($validation->fails()) {
 		return jsonResponse(['error' => 'Provide valid email in query parameter'], 422);
 	}
 
